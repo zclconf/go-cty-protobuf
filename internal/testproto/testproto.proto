@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+// This is here only to give us some convenient-to-access message types
+// for use in this module's unit tests.
+//
+// To regenerate the .pb.go file:
+// protoc --go_out=. --go_opt=paths=source_relative testproto.proto
+//
+// With that said, we only use the generated Go package as a convenient way
+// to access the underlying descriptors using protoreflect, so we largely
+// ignore most of what protoc generates.
+
+package testproto;
+
+option go_package = "github.com/zclconf/go-cty-protobuf/internal/testproto";
+
+import "google/protobuf/any.proto";
+
+message Assorted {
+    double t_double = 1;
+    float t_float = 2;
+    int32 t_int32 = 3;
+    int64 t_int64 = 4;
+    uint32 t_uint32 = 5;
+    uint64 t_uint64 = 6;
+    sint32 t_sint32 = 7;
+    sint64 t_sint64 = 8;
+    fixed32 t_fixed32 = 9;
+    fixed64 t_fixed64 = 10;
+    sfixed32 t_sfixed32 = 11;
+    sfixed64 t_sfixed64 = 12;
+    bool t_bool = 13;
+    string t_string = 14;
+    bytes t_bytes = 15;
+
+    message Nested {
+        string t_nested_field = 1;
+    }
+    Nested t_message = 16;
+}
+
+message WithOneOf {
+    string outside = 1;
+    oneof t_oneof {
+        string a = 2;
+        string b = 3;
+    }
+}
+
+message WithRepeated {
+    message Nested {
+        string t_nested_field = 1;
+    }
+
+    repeated string t_strings = 1;
+    repeated Nested t_message = 2;
+    map<string, bool> t_map_string_bool = 3;
+    map<int64, bool> t_map_number_bool = 4;
+    map<string, Nested> t_map_string_message = 5;
+    map<int64, Nested> t_map_number_message = 6;
+}
+
+message WithAny {
+    string t_string = 1;
+    google.protobuf.Any t_any = 2;
+    repeated google.protobuf.Any t_any_list = 3;
+    map<string,google.protobuf.Any> t_any_map_string = 4;
+    map<int64,google.protobuf.Any> t_any_map_number = 5;
+}
+
+message WithEnum {
+    enum Things {
+        A = 0;
+        b = 1;
+        C = 2;
+        d = 3;
+    }
+
+    string t_string = 1;
+    Things t_enum = 2;
+}
