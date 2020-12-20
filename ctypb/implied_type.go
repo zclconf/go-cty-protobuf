@@ -61,11 +61,13 @@ func impliedTypeForFieldDesc(field protoreflect.FieldDescriptor, path cty.Path) 
 		// entry objects with "key" and "value" attributes, because
 		// that's the closest approximation of that intent which we
 		// can achieve in cty.
-		if kind, sub := field.Kind(), field.Message(); kind == protoreflect.MessageKind && sub.IsMapEntry() {
+		if field.IsMap() {
+			sub := field.Message()
 			subFields := sub.Fields()
 			keyField := subFields.ByNumber(1)
 			valField := subFields.ByNumber(2)
-			if keyField.Kind() == protoreflect.StringKind {
+			switch {
+			case keyField.Kind() == protoreflect.StringKind:
 				// Temporarily extend path with placeholder for indexing.
 				path := append(path, cty.IndexStep{Key: cty.UnknownVal(cty.String)})
 				valTy, err := impliedTypeForFieldDesc(valField, path)
@@ -73,7 +75,7 @@ func impliedTypeForFieldDesc(field protoreflect.FieldDescriptor, path cty.Path) 
 					return cty.NilType, err
 				}
 				return cty.Map(valTy), nil
-			} else {
+			default:
 				keyTy, err := impliedTypeForFieldDesc(keyField, path)
 				if err != nil {
 					return cty.NilType, err

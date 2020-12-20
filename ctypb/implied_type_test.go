@@ -40,6 +40,21 @@ func TestImpliedTypeForMessageDesc(t *testing.T) {
 			}),
 		},
 		{
+			Input: (*testproto.WithOptional)(nil).ProtoReflect().Descriptor(),
+			// "optional" has no effect on the implied type, because
+			// all values attributes are nullable in cty, but it
+			// does decide whether a particular attribute can be null
+			// when converting values between the two systems.
+			Want: cty.Object(map[string]cty.Type{
+				"int32_opt":   cty.Number,
+				"int32_req":   cty.Number,
+				"message_opt": cty.EmptyObject,
+				"message_req": cty.EmptyObject,
+				"string_opt":  cty.String,
+				"string_req":  cty.String,
+			}),
+		},
+		{
 			Input: (*testproto.WithOneOf)(nil).ProtoReflect().Descriptor(),
 			Want: cty.Object(map[string]cty.Type{
 				"a":       cty.String,
@@ -134,6 +149,8 @@ func TestImpliedTypeForMessageDesc(t *testing.T) {
 					t.Fatalf("wrong error\ngot:  %s\nwant: %s", got, want)
 				}
 				return
+			} else if err != nil {
+				t.Fatalf("unexpected error\ngot: %s", err.Error())
 			}
 
 			if !test.Want.Equals(got) {

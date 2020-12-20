@@ -4,7 +4,7 @@ syntax = "proto3";
 // for use in this module's unit tests.
 //
 // To regenerate the .pb.go file:
-// protoc --go_out=. --go_opt=paths=source_relative testproto.proto
+// protoc --go_out=. --go_opt=paths=source_relative testproto.proto --experimental_allow_proto3_optional
 //
 // With that said, we only use the generated Go package as a convenient way
 // to access the underlying descriptors using protoreflect, so we largely
@@ -37,6 +37,17 @@ message Assorted {
         string t_nested_field = 1;
     }
     Nested t_message = 16;
+}
+
+message WithOptional {
+    message Nested {}
+
+    string string_req = 1;
+    optional string string_opt = 2;
+    int32 int32_req = 3;
+    optional int32 int32_opt = 4;
+    Nested message_req = 5; // not actually required; messages are always optional
+    optional Nested message_opt = 6;
 }
 
 message WithOneOf {
@@ -78,4 +89,11 @@ message WithEnum {
 
     string t_string = 1;
     Things t_enum = 2;
+}
+
+message Empty {
+}
+
+message Simple {
+    Empty foo = 1;
 }
